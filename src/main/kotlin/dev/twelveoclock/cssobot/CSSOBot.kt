@@ -1,5 +1,6 @@
 package dev.twelveoclock.cssobot
 
+import dev.twelveoclock.cssobot.math.ShuntingYard
 import dev.twelveoclock.lang.crescent.lexers.CrescentLexer
 import dev.twelveoclock.lang.crescent.parsers.CrescentParser
 import dev.twelveoclock.lang.crescent.vm.CrescentVM
@@ -8,14 +9,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.dv8tion.jda.api.JDABuilder
+import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Activity
+import net.dv8tion.jda.api.events.guild.GuildJoinEvent
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.interactions.commands.OptionType
+import net.dv8tion.jda.api.requests.GatewayIntent
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import kotlin.io.path.Path
 import kotlin.io.path.readText
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 object CSSOBot : ListenerAdapter() {
@@ -23,51 +29,90 @@ object CSSOBot : ListenerAdapter() {
     @JvmStatic
     fun main(args: Array<String>) {
 
-        val jda = JDABuilder.createLight(Path("token.txt").readText(), emptyList())
+        val jda = JDABuilder.createLight(Path("token.txt").readText(), listOf(GatewayIntent.GUILD_MESSAGES))
             .addEventListeners(this)
             .setActivity(Activity.playing("Stuck in the matrix"))
             .build()
 
-        jda.upsertCommand("crescent", "Run crescent code")
-            .addOption(OptionType.STRING, "code", "The code to execute", true)
-            .queue()
+        jda.awaitReady()
 
         println("Started! ${jda.getInviteUrl()}")
+
+        /*
+        jda.upsertCommand("crescent", "Run crescent code")
+            .addOption(OptionType., "code", "The code to execute", true)
+            .queue()
+
+        println("Started! ${jda.getInviteUrl()}&scope=applications.commands")
+        */
+
     }
 
 
-    override fun onSlashCommand(event: SlashCommandEvent) {
+    override fun onMessageReceived(event: MessageReceivedEvent) {
 
-        if (event.name != "crescent") {
-            return
-        }
+        val label = event.message.contentRaw.split(' ', '\n').first()
 
-        CoroutineScope(Dispatchers.IO).launch {
+        when(label) {
 
-            val job = launch(Dispatchers.IO) {
-                try {
+            "!crescent" -> {
 
-                    val code = event.getOption("code")!!.asString.replace("`", "").trim()
+                CoroutineScope(Dispatchers.IO).launch {
 
-                    val output = collectSystemOut {
-                        val file = CrescentParser.invoke(Path(""), CrescentLexer.invoke(code))
-                        CrescentVM(listOf(file), file).invoke()
+                    val job = launch(Dispatchers.IO) {
+                        try {
+
+                            val code = event.message.contentRaw.substringAfter(label).replace("`", "").trim()
+
+                            val output = collectSystemOut {
+                                val file = CrescentParser.invoke(Path(""), CrescentLexer.invoke(code))
+                                CrescentVM(listOf(file), file).invoke()
+                            }
+
+                            event.channel.sendMessage("```\n$output```").queue()
+                        }
+                        catch (ex: Throwable) {
+                            event.channel.sendMessage("${ex::class}: ${ex.message}, printed error to console!")
+                            ex.printStackTrace()
+                        }
                     }
 
-                    event.channel.sendMessage("```\n$output```").queue()
-                }
-                catch (ex: Throwable) {
-                    event.channel.sendMessage("${ex::class}: ${ex.message}, printed error to console!")
-                    ex.printStackTrace()
+                    delay(10.seconds)
+
+                    if (job.isActive) {
+                        job.cancel()
+                        event.channel.sendMessage("Code took longer than 10 seconds to run").queue()
+                    }
                 }
             }
 
-            delay(10.seconds)
+            "!math" -> {
+                CoroutineScope(Dispatchers.IO).launch {
 
-            if (job.isActive) {
-                job.cancel()
-                event.channel.sendMessage("Code took longer than 10 seconds to run").queue()
+                    val job = launch {
+                        try {
+
+                            val input = event.message.contentRaw.substringAfter(label).replace("`", "").trim()
+                            val output = ShuntingYard.evaluate(input)
+
+                            event.channel.sendMessage("```\n${ShuntingYard.invoke(input)}```").queue()
+                            event.channel.sendMessage("```\n$output```").queue()
+                        }
+                        catch (ex: Throwable) {
+                            event.channel.sendMessage("${ex::class}: ${ex.message}, printed error to console!").queue()
+                            ex.printStackTrace()
+                        }
+                    }
+
+                    delay(10.seconds)
+
+                    if (job.isActive) {
+                        job.cancel()
+                        event.channel.sendMessage("Code took longer than 10 seconds to run").queue()
+                    }
+                }
             }
+
         }
     }
 
