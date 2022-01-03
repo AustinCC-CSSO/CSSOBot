@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.requests.GatewayIntent
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
+import kotlin.concurrent.thread
 import kotlin.io.path.Path
 import kotlin.io.path.readText
 import kotlin.time.Duration
@@ -59,7 +60,8 @@ object CSSOBot : ListenerAdapter() {
 
                 CoroutineScope(Dispatchers.IO).launch {
 
-                    val job = launch(Dispatchers.IO) {
+                    // Needs to be thread so it can actually be cancelled :C
+                    val job = thread {
                         try {
 
                             val code = event.message.contentRaw.substringAfter(label).replace("`", "").trim()
@@ -79,8 +81,8 @@ object CSSOBot : ListenerAdapter() {
 
                     delay(10.seconds)
 
-                    if (job.isActive) {
-                        job.cancel()
+                    if (job.isAlive) {
+                        job.stop()
                         event.channel.sendMessage("Code took longer than 10 seconds to run").queue()
                     }
                 }
@@ -89,7 +91,8 @@ object CSSOBot : ListenerAdapter() {
             "!math" -> {
                 CoroutineScope(Dispatchers.IO).launch {
 
-                    val job = launch {
+                    // Needs to be thread so it can actually be cancelled :C
+                    val job = thread {
                         try {
 
                             val input = event.message.contentRaw.substringAfter(label).replace("`", "").trim()
@@ -106,8 +109,8 @@ object CSSOBot : ListenerAdapter() {
 
                     delay(10.seconds)
 
-                    if (job.isActive) {
-                        job.cancel()
+                    if (job.isAlive) {
+                        job.stop()
                         event.channel.sendMessage("Code took longer than 10 seconds to run").queue()
                     }
                 }
