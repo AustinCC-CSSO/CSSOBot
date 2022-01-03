@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import kotlin.io.path.Path
+import kotlin.io.path.readText
 import kotlin.time.Duration.Companion.seconds
 
 object CSSOBot : ListenerAdapter() {
@@ -22,7 +23,7 @@ object CSSOBot : ListenerAdapter() {
     @JvmStatic
     fun main(args: Array<String>) {
 
-        val jda = JDABuilder.createLight("Token", emptyList())
+        val jda = JDABuilder.createLight(Path("token.txt").readText(), emptyList())
             .addEventListeners(this)
             .setActivity(Activity.playing("Stuck in the matrix"))
             .build()
@@ -31,6 +32,7 @@ object CSSOBot : ListenerAdapter() {
             .addOption(OptionType.STRING, "code", "The code to execute", true)
             .queue()
 
+        println("Started! ${jda.getInviteUrl()}")
     }
 
 
@@ -52,7 +54,7 @@ object CSSOBot : ListenerAdapter() {
                         CrescentVM(listOf(file), file).invoke()
                     }
 
-                    event.reply("```\n$output```").queue()
+                    event.channel.sendMessage("```\n$output```").queue()
                 }
                 catch (ex: Throwable) {
                     event.channel.sendMessage("${ex::class}: ${ex.message}, printed error to console!")
@@ -64,7 +66,7 @@ object CSSOBot : ListenerAdapter() {
 
             if (job.isActive) {
                 job.cancel()
-                event.reply("Code took longer than 10 seconds to run").queue()
+                event.channel.sendMessage("Code took longer than 10 seconds to run").queue()
             }
         }
     }

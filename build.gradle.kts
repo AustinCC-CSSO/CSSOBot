@@ -13,6 +13,8 @@ repositories {
 
 dependencies {
 
+    runtimeOnly("org.slf4j:slf4j-simple:1.7.32")
+
     implementation(kotlin("stdlib-jdk8"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
 
