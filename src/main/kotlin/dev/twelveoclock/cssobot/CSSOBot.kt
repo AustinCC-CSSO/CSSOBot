@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.requests.GatewayIntent
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
+import java.util.concurrent.CancellationException
 import kotlin.concurrent.thread
 import kotlin.io.path.Path
 import kotlin.io.path.readText
@@ -60,7 +61,7 @@ object CSSOBot : ListenerAdapter() {
 
                 CoroutineScope(Dispatchers.IO).launch {
 
-                    // Needs to be thread so it can actually be cancelled :C
+                    // Needs to be a thread, so it can actually be cancelled :C
                     val job = thread {
                         try {
 
@@ -89,9 +90,10 @@ object CSSOBot : ListenerAdapter() {
             }
 
             "!math" -> {
+
                 CoroutineScope(Dispatchers.IO).launch {
 
-                    // Needs to be thread so it can actually be cancelled :C
+                    // Needs to be a thread, so it can actually be cancelled :C
                     val job = thread {
                         try {
 
