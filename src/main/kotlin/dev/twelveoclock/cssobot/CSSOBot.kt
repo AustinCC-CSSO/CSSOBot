@@ -12,6 +12,8 @@ import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
@@ -31,7 +33,7 @@ object CSSOBot : ListenerAdapter() {
     @JvmStatic
     fun main(args: Array<String>) {
 
-        val jda = JDABuilder.createLight(Path("token.txt").readText(), listOf(GatewayIntent.GUILD_MESSAGES))
+        val jda = JDABuilder.createLight(Path("token.txt").readText(), listOf(GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES))
             .addEventListeners(this)
             .setActivity(Activity.playing("Stuck in the matrix"))
             .build()
@@ -50,6 +52,13 @@ object CSSOBot : ListenerAdapter() {
 
     }
 
+    override fun onGuildVoiceJoin(event: GuildVoiceJoinEvent) {
+        super.onGuildVoiceJoin(event)
+    }
+
+    override fun onGuildVoiceLeave(event: GuildVoiceLeaveEvent) {
+        super.onGuildVoiceLeave(event)
+    }
 
     override fun onMessageReceived(event: MessageReceivedEvent) {
 
