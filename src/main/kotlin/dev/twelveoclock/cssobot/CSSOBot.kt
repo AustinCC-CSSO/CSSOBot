@@ -33,7 +33,7 @@ object CSSOBot : ListenerAdapter() {
         println("Started! ${jda.getInviteUrl()}")
 
         /* Add shutdown hook */
-        Runtime.getRuntime().addShutdownHook(thread {
+        Runtime.getRuntime().addShutdownHook(thread(start = false) {
             userModule.disable()
             commandModule.disable()
         })
