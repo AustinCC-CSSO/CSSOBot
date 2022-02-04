@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.requests.GatewayIntent
+import net.dv8tion.jda.api.utils.cache.CacheFlag
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.util.concurrent.CancellationException
@@ -34,6 +35,7 @@ object CSSOBot : ListenerAdapter() {
     fun main(args: Array<String>) {
 
         val jda = JDABuilder.createLight(Path("token.txt").readText(), listOf(GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES))
+            .enableCache(CacheFlag.VOICE_STATE)
             .addEventListeners(this)
             .setActivity(Activity.playing("Stuck in the matrix"))
             .build()
