@@ -55,6 +55,8 @@ object CSSOBot : ListenerAdapter() {
     }
 
     override fun onGuildVoiceJoin(event: GuildVoiceJoinEvent) {
+        println("Joined Voice Channel ${event.channelJoined.timeCreated}")
+
         super.onGuildVoiceJoin(event)
     }
 
