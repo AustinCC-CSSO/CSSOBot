@@ -117,7 +117,19 @@ object CSSOBot : ListenerAdapter() {
                     }
                 }
             }
+            /*
+            "!log" -> {
 
+                val message = event.message.contentRaw.substringAfter(label).trim()
+
+                if (message.isEmpty()) {
+                    event.channel.sendMessage("Please provide a message to log").queue()
+                } else {
+                    event.channel.sendMessage("Logged message $message").queue()
+                }
+
+            }
+            */
         }
     }
 
