@@ -1,6 +1,7 @@
 plugins {
     application
     kotlin("jvm") version "1.6.10"
+    kotlin("plugin.serialization") version "1.6.10"
     id("com.github.johnrengelman.shadow") version "7.1.0"
 }
 
@@ -13,14 +14,15 @@ repositories {
 
 dependencies {
 
-    runtimeOnly("org.slf4j:slf4j-simple:1.7.32")
+    runtimeOnly("org.slf4j:slf4j-simple:1.7.35")
 
     implementation(kotlin("stdlib-jdk8"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
 
     implementation("dev.twelveoclock.lang:CrescentLang:+")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
 
-    implementation("net.dv8tion:JDA:5.0.0-alpha.3") {
+    implementation("net.dv8tion:JDA:5.0.0-alpha.5") {
         // Exclude audio stuff
         exclude(module = "opus-java")
     }
