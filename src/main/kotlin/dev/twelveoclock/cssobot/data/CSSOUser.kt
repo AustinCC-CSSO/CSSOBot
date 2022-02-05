@@ -3,8 +3,8 @@ package dev.twelveoclock.cssobot.data
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class User(
+data class CSSOUser(
     val id: Long,
-    val timeInMeetingInEpoch: Long,
-    val points: Map<Point, Long>,
+    val timeInMeetingInEpoch: Long = 0,
+    val points: Map<Point, Long> = mutableMapOf(),
 )

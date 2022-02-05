@@ -1,7 +1,7 @@
 package dev.twelveoclock.cssobot
 
 import dev.twelveoclock.cssobot.modules.CommandModule
-import dev.twelveoclock.cssobot.modules.UserModule
+import dev.twelveoclock.cssobot.modules.CSSOUserModule
 import dev.twelveoclock.cssobot.modules.base.Module
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.Activity
@@ -27,7 +27,7 @@ object CSSOBot : ListenerAdapter() {
         jda.awaitReady()
 
         /* Start modules */
-        val userModule = UserModule(jda).apply(Module::enable)
+        val userModule = CSSOUserModule(jda).apply(Module::enable)
         val commandModule = CommandModule(jda).apply(Module::enable)
 
         println("Started! ${jda.getInviteUrl()}")
