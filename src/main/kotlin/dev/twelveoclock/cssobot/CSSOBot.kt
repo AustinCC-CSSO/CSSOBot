@@ -26,8 +26,10 @@ object CSSOBot : ListenerAdapter() {
 
         jda.awaitReady()
 
+        val cssoGuild = jda.getGuildById(670315518393188363L)!!
+
         /* Start modules */
-        val userModule = CSSOUserModule(jda).apply(Module::enable)
+        val userModule = CSSOUserModule(cssoGuild, jda).apply(Module::enable)
         val commandModule = CommandModule(jda).apply(Module::enable)
 
         println("Started! ${jda.getInviteUrl()}")

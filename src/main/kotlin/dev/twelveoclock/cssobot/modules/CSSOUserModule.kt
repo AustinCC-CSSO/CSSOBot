@@ -9,18 +9,24 @@ import net.dv8tion.jda.api.entities.VoiceChannel
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent
 import java.nio.file.Path
-import kotlin.io.path.Path
-import kotlin.io.path.exists
-import kotlin.io.path.readText
-import kotlin.io.path.writeText
+import kotlin.io.path.*
 
 class CSSOUserModule(val guild: Guild, override val jda: JDA) : ListenerModule() {
 
     // ID -> Join Time
     val userJoinTime = mutableMapOf<Long, Long>()
 
+    val guildFolder = Path("${guild.name}:${guild.id}")
+
+    val usersFolder = guildFolder.resolve("Users")
+
 
     override fun onEnable() {
+
+        if (guildFolder.notExists()) {
+            guildFolder.createDirectories()
+        }
+
         guild.voiceChannels
             .flatMap(VoiceChannel::getMembers)
             .forEach { voiceJoin(it.idLong) }
@@ -71,11 +77,10 @@ class CSSOUserModule(val guild: Guild, override val jda: JDA) : ListenerModule()
         }
     }
 
+
     companion object {
 
         val json = Json { prettyPrint = true }
-
-        val usersFolder = Path("Users")
 
     }
 
