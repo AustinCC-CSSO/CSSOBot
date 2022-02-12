@@ -99,6 +99,7 @@ class CommandModule(override val jda: JDA) : ListenerModule() {
                     }
                 }
             }
+
             /*
             "!log" -> {
 
